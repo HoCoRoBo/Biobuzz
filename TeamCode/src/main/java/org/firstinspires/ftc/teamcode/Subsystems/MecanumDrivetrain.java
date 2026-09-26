@@ -6,8 +6,8 @@ import org.firstinspires.ftc.teamcode.Constants.MotorConstants;
 import org.firstinspires.ftc.teamcode.Hardware;
 import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-
-
+import org.firstinspires.ftc.teamcode.Types.MotorPowers;
+import org.firstinspires.ftc.teamcode.Utils.MecanumDrivetrainUtils;
 
 
 public class MecanumDrivetrain {
@@ -30,6 +30,9 @@ public class MecanumDrivetrain {
 
     public MecanumDrivetrain(Hardware hardware){
 
+
+
+
         this.frontLeftMotor = hardware.frontLeftMotor;
         this.frontRightMotor = hardware.frontRightMotor;
         this.backLeftMotor = hardware.backLeftMotor;
@@ -37,33 +40,20 @@ public class MecanumDrivetrain {
 
         this.imu = hardware.imu;
 
+        resetHeading();
+        setSlowMode(false);
+        setBrakeMode(true);
+
     }
 
-    public void mecanumDrive(double x, double y, double turn) {
+    public void robotCentricDrive(double x, double y, double turn) {
 
-        double frontLeft  = y + x + turn;
-        double frontRight = y - x - turn;
-        double backLeft   = y - x + turn;
-        double backRight  = y + x - turn;
 
-        double max = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(turn), 1);
-
-        frontLeft /= max;
-        frontRight /= max;
-        backLeft /= max;
-        backRight /= max;
-
-        frontLeft *= powerScale;
-        frontRight *= powerScale;
-        backLeft *= powerScale;
-        backRight *= powerScale;
-
+        MotorPowers motorPowers = MecanumDrivetrainUtils.robotCentricPowers(x, y, turn);
+        motorPowers.multiply(powerScale);
 
         setMotorPowers(
-                frontLeft,
-                frontRight,
-                backLeft,
-                backRight
+                motorPowers
         );
     }
 
@@ -71,40 +61,18 @@ public class MecanumDrivetrain {
 
         double heading = imu.getRobotYawPitchRollAngles()
                 .getYaw(AngleUnit.RADIANS);
-
-        // Rotate joystick input by the robot's heading
-        double rotatedX = x * Math.cos(-heading) - y * Math.sin(-heading);
-        double rotatedY = x * Math.sin(-heading) + y * Math.cos(-heading);
-
-        double frontLeft  = rotatedY + rotatedX + turn;
-        double frontRight = rotatedY - rotatedX - turn;
-        double backLeft   = rotatedY - rotatedX + turn;
-        double backRight  = rotatedY + rotatedX - turn;
-
-
-        double max = Math.max(Math.abs(rotatedY) + Math.abs(rotatedX) + Math.abs(turn), 1);
-
-        frontLeft /= max;
-        frontRight /= max;
-        backLeft /= max;
-        backRight /= max;
-
-        frontLeft *= powerScale;
-        frontRight *= powerScale;
-        backLeft *= powerScale;
-        backRight *= powerScale;
+        MotorPowers motorPowers = MecanumDrivetrainUtils.fieldCentricPowers(x, y, turn, heading);
+        motorPowers.multiply(powerScale);
 
         setMotorPowers(
-                frontLeft,
-                frontRight,
-                backLeft,
-                backRight
+                motorPowers
         );
     }
 
 
 
     public void resetHeading() {
+        if (imu == null) return;
         imu.resetYaw();
     }
 
@@ -114,7 +82,7 @@ public class MecanumDrivetrain {
     }
 
     public void stop() {
-        setMotorPowers(0, 0, 0, 0);
+        setMotorPowers(new MotorPowers(0, 0, 0, 0));
     }
 
     public void setPowerScale(double power) {
@@ -124,16 +92,13 @@ public class MecanumDrivetrain {
 
 
     public void setMotorPowers(
-            double frontLeft,
-            double frontRight,
-            double backLeft,
-            double backRight) {
+            MotorPowers motorPowers) {
 
 
-        frontLeftMotor.setPower(frontLeft);
-        frontRightMotor.setPower(frontRight);
-        backLeftMotor.setPower(backLeft);
-        backRightMotor.setPower(backRight);
+        frontLeftMotor.setPower(motorPowers.frontLeft);
+        frontRightMotor.setPower(motorPowers.frontRight);
+        backLeftMotor.setPower(motorPowers.backLeft);
+        backRightMotor.setPower(motorPowers.backRight);
     }
 
 
