@@ -2,12 +2,13 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.Constants.MotorConstants;
-import org.firstinspires.ftc.teamcode.Hardware;
+import org.firstinspires.ftc.teamcode.Constants.DrivetrainConstants;
+import org.firstinspires.ftc.teamcode.RobotHardware;
 import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Types.MotorPowers;
 import org.firstinspires.ftc.teamcode.Utils.MecanumDrivetrainUtils;
+import org.firstinspires.ftc.teamcode.Utils.RobotTelemetry;
 
 
 public class MecanumDrivetrain {
@@ -16,19 +17,17 @@ public class MecanumDrivetrain {
     private final DcMotor frontRightMotor;
     private final DcMotor backLeftMotor;
     private final DcMotor backRightMotor;
+    private final RobotTelemetry telemetry;
 
     private final IMU imu;
 
+    //For slow mode
 
-    private double powerScale = MotorConstants.NORMAL_MODE_POWER_SCALE;
-
-
-    //Mode
-
-    public boolean SlowMode = false;
+    private double powerScale = DrivetrainConstants.NORMAL_MODE_POWER_SCALE;
 
 
-    public MecanumDrivetrain(Hardware hardware){
+
+    public MecanumDrivetrain(RobotHardware hardware, RobotTelemetry telemetry){
 
 
 
@@ -39,6 +38,7 @@ public class MecanumDrivetrain {
         this.backRightMotor = hardware.backRightMotor;
 
         this.imu = hardware.imu;
+        this.telemetry = telemetry;
 
         resetHeading();
         setSlowMode(false);
@@ -46,7 +46,21 @@ public class MecanumDrivetrain {
 
     }
 
-    public void robotCentricDrive(double x, double y, double turn) {
+    public void drive(double x, double y, double turn) {
+
+        switch (DrivetrainConstants.currentDriveType) {
+
+            case RobotCentric:
+                robotCentricDrive(x, y, turn);
+                break;
+
+            case FieldCentric:
+                fieldCentricDrive(x, y, turn);
+                break;
+        }
+    }
+
+    private void robotCentricDrive(double x, double y, double turn) {
 
 
         MotorPowers motorPowers = MecanumDrivetrainUtils.robotCentricPowers(x, y, turn);
@@ -57,7 +71,7 @@ public class MecanumDrivetrain {
         );
     }
 
-    public void fieldCentricDrive(double x, double y, double turn) {
+    private void fieldCentricDrive(double x, double y, double turn) {
 
         double heading = imu.getRobotYawPitchRollAngles()
                 .getYaw(AngleUnit.RADIANS);
@@ -72,13 +86,12 @@ public class MecanumDrivetrain {
 
 
     public void resetHeading() {
-        if (imu == null) return;
         imu.resetYaw();
     }
 
     public void setSlowMode(boolean slowMode){
-        if (slowMode) setPowerScale(MotorConstants.SLOW_MODE_POWER_SCALE);
-        else setPowerScale(MotorConstants.NORMAL_MODE_POWER_SCALE);
+        if (slowMode) setPowerScale(DrivetrainConstants.SLOW_MODE_POWER_SCALE);
+        else setPowerScale(DrivetrainConstants.NORMAL_MODE_POWER_SCALE);
     }
 
     public void stop() {
@@ -99,6 +112,26 @@ public class MecanumDrivetrain {
         frontRightMotor.setPower(motorPowers.frontRight);
         backLeftMotor.setPower(motorPowers.backLeft);
         backRightMotor.setPower(motorPowers.backRight);
+
+    }
+
+    public void addTelemetry(){
+        telemetry.add(
+                "FL",
+                frontLeftMotor.getPower()
+        );
+        telemetry.add(
+                "FR",
+                frontRightMotor.getPower()
+        );
+        telemetry.add(
+                "BL",
+                backLeftMotor.getPower()
+        );
+        telemetry.add(
+                "BR",
+                backRightMotor.getPower()
+        );
     }
 
 

@@ -3,9 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.Servo;
 
-public class Hardware {
+public class RobotHardware {
 
     public final DcMotor frontLeftMotor;
     public final DcMotor frontRightMotor;
@@ -15,7 +14,7 @@ public class Hardware {
     public final IMU imu;
 
 
-    public Hardware(HardwareMap hardwareMap) {
+    public RobotHardware(HardwareMap hardwareMap) {
 
         frontLeftMotor = hardwareMap.get(DcMotor.class, "leftFront");
         frontRightMotor = hardwareMap.get(DcMotor.class, "rightFront");
