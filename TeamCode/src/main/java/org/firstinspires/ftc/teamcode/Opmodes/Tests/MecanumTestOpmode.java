@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.DriverControls.MecanumTestDriverControls;
-import org.firstinspires.ftc.teamcode.RobotHardware;
+import org.firstinspires.ftc.teamcode.Hardware.DrivetrainHardware;
 import org.firstinspires.ftc.teamcode.Subsystems.MecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.Utils.RobotTelemetry;
 
@@ -18,9 +18,9 @@ public class MecanumTestOpmode extends LinearOpMode {
 
         RobotTelemetry robotTelemetry = new RobotTelemetry(telemetry);
 
-        RobotHardware robotHardware = new RobotHardware(hardwareMap);
+        DrivetrainHardware drivetrainHardware = new DrivetrainHardware(hardwareMap);
 
-        MecanumDrivetrain drivetrain = new MecanumDrivetrain(robotHardware, robotTelemetry);
+        MecanumDrivetrain drivetrain = new MecanumDrivetrain(drivetrainHardware, robotTelemetry);
 
         MecanumTestDriverControls driverControls = new MecanumTestDriverControls(gamepad1);
 

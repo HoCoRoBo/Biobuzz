@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.Constants.DrivetrainConstants;
-import org.firstinspires.ftc.teamcode.RobotHardware;
+import org.firstinspires.ftc.teamcode.Hardware.DrivetrainHardware;
 import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Types.MotorPowers;
@@ -27,7 +27,7 @@ public class MecanumDrivetrain {
 
 
 
-    public MecanumDrivetrain(RobotHardware hardware, RobotTelemetry telemetry){
+    public MecanumDrivetrain(DrivetrainHardware hardware, RobotTelemetry telemetry){
 
 
 
